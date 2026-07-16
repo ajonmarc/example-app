@@ -5,10 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-use App\Models\Admin;
-use App\Models\Seller;
-use App\Models\Customer;
-use App\Models\SA;
+use App\Models\User;
 
 class UserSeeder extends Seeder
 {
@@ -17,32 +14,36 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-         $admin = Admin::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password'),
+        $sa = User::create([
+            'name' => 'Super Admin',
+            'email' => 'sa@example.com',
+            'password' => 'password',
         ]);
+
+        $sa->assignRole('sa');
+
+        $admin = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => 'password',
+        ]);
+
         $admin->assignRole('admin');
 
-        $seller = Seller::create([
-            'name' => 'Seller User',
+        $seller = User::create([
+            'name' => 'Seller',
             'email' => 'seller@example.com',
-            'password' => bcrypt('password'),
+            'password' => 'password',
         ]);
+
         $seller->assignRole('seller');
 
-        $customer = Customer::create([
-            'name' => 'Customer User',
+        $customer = User::create([
+            'name' => 'Customer',
             'email' => 'customer@example.com',
-            'password' => bcrypt('password'),
+            'password' => 'password',
         ]);
-        $customer->assignRole('customer');
 
-        $sa = SA::create([
-            'name' => 'SA User',
-            'email' => 'sa@example.com',
-            'password' => bcrypt('password'),
-        ]);
-        $sa->assignRole('sa');
+        $customer->assignRole('customer');
     }
 }

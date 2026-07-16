@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
@@ -16,10 +15,9 @@ class RolesAndPermissionsSeeder extends Seeder
     public function run(): void
     {
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $guards = ['admin', 'seller', 'customer', 'sa'];
-
+        // Create permissions
         $permissions = [
             'edit articles',
             'delete articles',
@@ -28,20 +26,25 @@ class RolesAndPermissionsSeeder extends Seeder
             'create users',
         ];
 
-        // Create permissions for each guard
-        foreach ($guards as $guard) {
-            foreach ($permissions as $permission) {
-                Permission::firstOrCreate([
-                    'name' => $permission,
-                    'guard_name' => $guard,
-                ]);
-            }
+        foreach ($permissions as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => 'web',
+            ]);
         }
 
-        // Admin role
+        // Super Admin
+        $sa = Role::firstOrCreate([
+            'name' => 'sa',
+            'guard_name' => 'web',
+        ]);
+
+        $sa->syncPermissions($permissions);
+
+        // Admin
         $admin = Role::firstOrCreate([
             'name' => 'admin',
-            'guard_name' => 'admin',
+            'guard_name' => 'web',
         ]);
 
         $admin->syncPermissions([
@@ -52,10 +55,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'create users',
         ]);
 
-        // Seller role
+        // Seller
         $seller = Role::firstOrCreate([
             'name' => 'seller',
-            'guard_name' => 'seller',
+            'guard_name' => 'web',
         ]);
 
         $seller->syncPermissions([
@@ -63,28 +66,14 @@ class RolesAndPermissionsSeeder extends Seeder
             'publish articles',
         ]);
 
-        // Customer role
+        // Customer
         $customer = Role::firstOrCreate([
             'name' => 'customer',
-            'guard_name' => 'customer',
+            'guard_name' => 'web',
         ]);
 
         $customer->syncPermissions([
             'edit articles',
-        ]);
-
-        // SA role
-        $sa = Role::firstOrCreate([
-            'name' => 'sa',
-            'guard_name' => 'sa',
-        ]);
-
-        $sa->syncPermissions([
-            'edit articles',
-            'delete articles',
-            'publish articles',
-            'unpublish articles',
-            'create users',
         ]);
     }
 }
